@@ -13,65 +13,100 @@ class DemoScene extends React.Component {
       cameraPosition: new THREE.Vector3(0, 0, 10),
       groupRotation: new THREE.Euler(0, 0, 0),
       scene: {},
-      counter:0,
+      lineCounter:0,
+      obstructionCounter:0,
       planeRotation: new THREE.Euler(),
       whiteLineMovement: new THREE.Vector3(.13,3,2),
       carMovement: new THREE.Vector3(0,-.5,8),
+      obstructionPosition1: new THREE.Vector3(.1,4,2),
+      obstructionPosition2: new THREE.Vector3(.2,3,2)
       }
     }
 
   componentDidMount() {
     const { scene } = this.refs;
-    this.setState({ scene });
+    this.setState({ scene })
+    // const interval = setInterval(this.makeObstruction, 5000)
   }
 
   _onAnimate = () => {
     this.setState({
-      counter: this.state.counter + .1,
+      lineCounter: this.state.lineCounter + .1,
+      obstructionCounter: this.state.obstructionCounter + .1,
       whiteLineMovement: new THREE.Vector3(
         this.state.whiteLineMovement.x = .13,
         this.state.whiteLineMovement.y - .1,
-        this.state.whiteLineMovement.z + .1,
+        this.state.whiteLineMovement.z + .1
+      ),
+      obstructionPosition1: new THREE.Vector3(
+        this.state.obstructionPosition1.x + .01,
+        this.state.obstructionPosition1.y - .1,
+        this.state.obstructionPosition1.z + .1
+      ),
+      obstructionPosition2: new THREE.Vector3(
+        this.state.obstructionPosition2.x - .01,
+        this.state.obstructionPosition2.y - .1,
+        this.state.obstructionPosition2.z + .1
       )
     }, () => this.resetter())
   }
 
   resetter = () =>{
-    Math.floor(this.state.counter) === 5.0 ? this.setState({counter:0, whiteLineMovement: new THREE.Vector3(.13,3, 2)}) : null
-  }
+    // console.log('is counter1 5?', this.state.counter1 === 5.0)
+    // console.log('is counter2 10?', this.state.counter2 === 10.0)
+     Math.floor(this.state.lineCounter) === 5.0 ? this.setState({lineCounter:0, whiteLineMovement: new THREE.Vector3(.13,3, 2)}) : null
+     Math.floor(this.state.obstructionCounter) === 10.0 ? this.setState({obstructionCounter:0, obstructionPosition1: new THREE.Vector3(this.makeObstruction(), 3, 4)}) : null
+
+     Math.floor(this.state.obstructionCounter) === 5.0 ? this.setState({obstructionPosition2: new THREE.Vector3(this.makeNegObstruction(), 3, 4)}) : null
+   }
+   // return num > 1.25 ? console.log('too big') :  console.log(num)
+
+
+
+   makeObstruction = () => {
+     let num = Math.random() / 4
+     console.log('positive: ', num);
+     return num
+    }
+    makeNegObstruction = () => {
+      let num = Math.random() / (4 * -1)
+      console.log('negative: ', num);
+      return num
+     }
 
   moveCar = (e) => {
-    console.log(e.key)
+    // console.log('x:', this.state.carMovement.x, 'y:', this.state.carMovement.y)
+
     if (e.key === 'ArrowLeft') {
       this.setState({
         carMovement: new THREE.Vector3(
           this.state.carMovement.x - .05,
-          this.state.carMovement.y = -.15,
-          this.state.carMovement.z = 8
+          this.state.carMovement.y = this.state.carMovement.y,
+          this.state.carMovement.z = this.state.carMovement.z
           )
       })
     }else if (e.key === 'ArrowRight') {
       this.setState({
         carMovement: new THREE.Vector3(
           this.state.carMovement.x + .05,
-          this.state.carMovement.y = -.15,
-          this.state.carMovement.z = 8
+          this.state.carMovement.y = this.state.carMovement.y,
+          this.state.carMovement.z = this.state.carMovement.z
           )
       })
     }else if (e.key === 'ArrowUp') {
       this.setState({
         carMovement: new THREE.Vector3(
-          this.state.carMovement.x = .05,
-          this.state.carMovement.y - -.15,
-          this.state.carMovement.z - .1
+          this.state.carMovement.x = this.state.carMovement.x,
+          this.state.carMovement.y + .05,
+          this.state.carMovement.z - .05
           )
       })
     }else if (e.key === 'ArrowDown') {
       this.setState({
         carMovement: new THREE.Vector3(
-          this.state.carMovement.x = .05,
-          this.state.carMovement.y + -.15,
-          this.state.carMovement.z + .1
+          this.state.carMovement.x = this.state.carMovement.x,
+          this.state.carMovement.y - .05,
+          this.state.carMovement.z + .05
           )
       })
     }
@@ -118,6 +153,16 @@ class DemoScene extends React.Component {
           <mesh rotation={new THREE.Euler(2,3.135)} position={this.state.whiteLineMovement} >
             <planeGeometry width={.2} height={3}/>
             <meshBasicMaterial color={'white'}/>
+          </mesh>
+
+          <mesh rotation={new THREE.Euler(2,3.135)} position={this.state.obstructionPosition1}>
+            <boxGeometry width={.2} height={.2} depth={.3}/>
+            <meshBasicMaterial color={'red'}/>
+          </mesh>
+
+          <mesh rotation={new THREE.Euler(2,3.135)} position={this.state.obstructionPosition2}>
+            <boxGeometry width={.2} height={.2} depth={.3}/>
+            <meshBasicMaterial color={'orange'}/>
           </mesh>
 
           <group>
@@ -182,7 +227,12 @@ class DemoScene extends React.Component {
             />
           </group>
 
-          <group name="exampleGroup" rotation={new THREE.Euler(.5, 59.7, 0)} position={this.state.carMovement}>
+          <mesh rotation={new THREE.Euler(2,3.135)} position={this.state.carMovement}>
+            <boxGeometry width={.2} height={.2} depth={.3}/>
+            <meshBasicMaterial />
+          </mesh>
+
+          {/* <group name="exampleGroup" rotation={new THREE.Euler(.5, 59.7, 0)} position={this.state.carMovement}>
             <ObjectModel
               name="exampleObject"
               model={exampleModel}
@@ -191,7 +241,7 @@ class DemoScene extends React.Component {
               scale={new THREE.Vector3(.1, .1, .1)}
               group="exampleGroup"
             />
-          </group>
+          </group> */}
         </scene>
       </React3>
     );
