@@ -4,6 +4,7 @@ import React from "react";
 import React3 from "react-three-renderer";
 import ObjectModel from 'react-three-renderer-objects';
 import truck from "../../assets/Monster_truck.obj";
+import car from "../../assets/Mr_Beep.obj"
 
 class DemoScene extends React.Component {
 
@@ -18,11 +19,15 @@ class DemoScene extends React.Component {
         planeRotation: new THREE.Euler(),
         whiteLineMovement: new THREE.Vector3(.13,3,2),
         carMovement: new THREE.Vector3(0,-.5,8),
+        //used for truck
+        carRotation: new THREE.Euler(.5, 59.7, 0),
+
+        //used for cube
+        // carRotation: new THREE.Euler(2,3.135),
         obstructionPosition1: new THREE.Vector3(.1,2,2),
         obstructionPosition2: new THREE.Vector3(.2,3,2),
         sky: new THREE.Vector3(-.5,7,0),
         desert: new THREE.Vector3(-.5,-17,-80),
-        // obstructionRotation: new THREE.Euler(2,3.135),
         obstructionRotation: new THREE.Euler(0,0,0),
         playerWidth: .2,
         playerHeight: .2,
@@ -44,25 +49,40 @@ class DemoScene extends React.Component {
     let playerY = this.state.carMovement.y
 
     // if we're just using the test box
-    let disWidth = this.state.playerWidth + 0.05
+    // let disWidth = this.state.playerWidth + 0.05
 
     // if we're using the big boi car
-    // let disWidth = this.state.playerWidth + 0.2
+    let disWidth = this.state.playerWidth + 0.2
 
     // Where the collision is at!
     if (this.state.yetAnotherCounter < 1){
       if (objX > playerX-disWidth && objX < playerX+disWidth && objY > playerY && objY < playerY+this.state.playerHeight) {
           ++this.state.yetAnotherCounter
           this.setState({collisionCount: this.state.collisionCount +1}, () => setTimeout(this.emptyFunction,500))
+          this.wreckCar()
         }
       }
     }
 
-  // emptyFunction = () => {
-  //   console.log('empty function ran')
-  // }
+  wreckCar = () => {
+    console.log(this.state.carRotation);
+    this.setState({
+      carRotation: new THREE.Euler(
+          this.state.carRotation.x + 0,
+          this.state.carRotation.y + 0.2,
+          0)
+      })
+  }
 
-  _onAnimate = () => {
+  animate = () =>{
+    if (this.state.collisionCount == 0) {
+      return this.normal_Animate()
+    }else {
+      return this.wreckCar()
+    }
+  }
+
+  normal_Animate = () => {
     this.detectCollision()
     this.setState({
       lineCounter: this.state.lineCounter + .1,
@@ -73,7 +93,7 @@ class DemoScene extends React.Component {
         this.state.whiteLineMovement.z + .1
       ),
       obstructionPosition1: new THREE.Vector3(
-        this.state.obstructionPosition1.x + .01,
+        this.state.obstructionPosition1.x + .06,
         this.state.obstructionPosition1.y - .1,
         this.state.obstructionPosition1.z + .1
       ),
@@ -167,7 +187,7 @@ class DemoScene extends React.Component {
         width={width}
         height={height}
         alpha={true}
-        onAnimate={this._onAnimate}
+        onAnimate={this.animate}
         canvasRef={this.canvasRef}
       >
         <scene ref="scene">
@@ -274,12 +294,12 @@ class DemoScene extends React.Component {
             />
           </group>
 
-          {/* <mesh rotation={new THREE.Euler(2,3.135)} position={this.state.carMovement}>
+          {/* <mesh rotation={this.state.carRotation} position={this.state.carMovement}>
             <boxGeometry width={this.state.playerWidth} height={this.state.playerHeight} depth={this.state.playerDepth}/>
             <meshBasicMaterial />
           </mesh> */}
 
-          <group name="exampleGroup" rotation={new THREE.Euler(.5, 59.7, 0)} position={this.state.carMovement}>
+          <group name="exampleGroup" rotation={this.state.carRotation} position={this.state.carMovement}>
             <ObjectModel
               name="exampleObject"
               model={truck}
@@ -293,8 +313,8 @@ class DemoScene extends React.Component {
           {/* <group name="sofa" rotation={new THREE.Euler(.5, 59.7, 0)} position={this.state.obstructionPosition1}>
             <ObjectModel
               name="exampleObject"
-              model={sofa}
-              material={sofaMaterial}
+              model={car}
+              // material={sofaMaterial}
               scene={this.state.scene}
               scale={new THREE.Vector3(.1, .1, .1)}
               group="sofa"
