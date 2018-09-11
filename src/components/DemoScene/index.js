@@ -20,12 +20,15 @@ class DemoScene extends React.Component {
         carMovement: new THREE.Vector3(0,-.5,8),
         obstructionPosition1: new THREE.Vector3(.1,2,2),
         obstructionPosition2: new THREE.Vector3(.2,3,2),
+        sky: new THREE.Vector3(-.5,7,0),
+        desert: new THREE.Vector3(-.5,-17,-80),
         // obstructionRotation: new THREE.Euler(2,3.135),
         obstructionRotation: new THREE.Euler(0,0,0),
         playerWidth: .2,
         playerHeight: .2,
         playerDepth: .3,
         collisionCount: 0,
+        yetAnotherCounter: 0
       }
     }
 
@@ -46,13 +49,18 @@ class DemoScene extends React.Component {
     // if we're using the big boi car
     // let disWidth = this.state.playerWidth + 0.2
 
-    if (objX > playerX-disWidth && objX < playerX+disWidth && objY > playerY && objY < playerY+this.state.playerHeight) {
-      this.setState({collisionCount: this.state.collisionCount + 1})
-      console.log("COLLISION HAPPENED", this.state.collisionCount);
-      console.log("----------");
+    // Where the collision is at!
+    if (this.state.yetAnotherCounter < 1){
+      if (objX > playerX-disWidth && objX < playerX+disWidth && objY > playerY && objY < playerY+this.state.playerHeight) {
+          ++this.state.yetAnotherCounter
+          this.setState({collisionCount: this.state.collisionCount +1}, () => setTimeout(this.emptyFunction,500))
+        }
+      }
     }
-  }
 
+  // emptyFunction = () => {
+  //   console.log('empty function ran')
+  // }
 
   _onAnimate = () => {
     this.detectCollision()
@@ -80,9 +88,6 @@ class DemoScene extends React.Component {
         this.state.obstructionPosition2.y - .1,
         this.state.obstructionPosition2.z + .1
       ),
-      // obstructionRotation: new THREE.Euler(
-      //   this.state.obstructionRotation.x + .1
-      // )
     }, () => this.resetter())
   }
 
@@ -182,12 +187,22 @@ class DemoScene extends React.Component {
             <meshBasicMaterial color={'grey'}/>
           </mesh>
 
+          <mesh position={this.state.sky}>
+            <planeGeometry width={50} height={6.5} widthSegments={200} heightSegments={200}/>
+            <meshBasicMaterial color={'blue'}/>
+          </mesh>
+
+          <mesh position={this.state.desert}>
+            <planeGeometry width={260} height={105} widthSegments={200} heightSegments={200}/>
+            <meshBasicMaterial color={'orange'}/>
+          </mesh>
+
           <mesh rotation={new THREE.Euler(2,3.135)} position={this.state.whiteLineMovement} >
             <planeGeometry width={.2} height={3}/>
             <meshBasicMaterial color={'white'}/>
           </mesh>
 
-          <mesh  rotation={this.state.obstructionRotation} position={this.state.obstructionPosition1}>
+          <mesh rotation={this.state.obstructionRotation} position={this.state.obstructionPosition1}>
             <boxGeometry width={this.state.playerWidth} height={this.state.playerHeight} depth={this.state.playerDepth}/>
             <meshBasicMaterial color={'red'}/>
           </mesh>
@@ -259,12 +274,12 @@ class DemoScene extends React.Component {
             />
           </group>
 
-          <mesh rotation={new THREE.Euler(2,3.135)} position={this.state.carMovement}>
+          {/* <mesh rotation={new THREE.Euler(2,3.135)} position={this.state.carMovement}>
             <boxGeometry width={this.state.playerWidth} height={this.state.playerHeight} depth={this.state.playerDepth}/>
             <meshBasicMaterial />
-          </mesh>
+          </mesh> */}
 
-          {/* <group name="exampleGroup" rotation={new THREE.Euler(.5, 59.7, 0)} position={this.state.carMovement}>
+          <group name="exampleGroup" rotation={new THREE.Euler(.5, 59.7, 0)} position={this.state.carMovement}>
             <ObjectModel
               name="exampleObject"
               model={truck}
@@ -273,7 +288,7 @@ class DemoScene extends React.Component {
               scale={new THREE.Vector3(.1, .1, .1)}
               group="exampleGroup"
             />
-          </group> */}
+          </group>
 
           {/* <group name="sofa" rotation={new THREE.Euler(.5, 59.7, 0)} position={this.state.obstructionPosition1}>
             <ObjectModel
