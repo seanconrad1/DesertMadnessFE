@@ -3,7 +3,7 @@ import * as THREE from "three";
 import React from "react";
 import React3 from "react-three-renderer";
 import ObjectModel from 'react-three-renderer-objects';
-import exampleModel from "../../assets/Monster_truck.obj";
+import truck from "../../assets/Monster_truck.obj";
 
 class DemoScene extends React.Component {
 
@@ -18,8 +18,10 @@ class DemoScene extends React.Component {
         planeRotation: new THREE.Euler(),
         whiteLineMovement: new THREE.Vector3(.13,3,2),
         carMovement: new THREE.Vector3(0,-.5,8),
-        obstructionPosition1: new THREE.Vector3(.1,4,2),
+        obstructionPosition1: new THREE.Vector3(.1,2,2),
         obstructionPosition2: new THREE.Vector3(.2,3,2),
+        // obstructionRotation: new THREE.Euler(2,3.135),
+        obstructionRotation: new THREE.Euler(0,0,0),
         playerWidth: .2,
         playerHeight: .2,
         playerDepth: .3,
@@ -30,28 +32,26 @@ class DemoScene extends React.Component {
   componentDidMount() {
     const { scene } = this.refs;
     this.setState({ scene })
-    // const interval = setInterval(this.makeObstruction, 5000)
   }
 
   detectCollision = () =>{
-    let playerRight = this.state.carMovement.x + (this.state.playerWidth / 2)
-    let playerLeft = this.state.carMovement.x - (this.state.playerWidth / 2)
-    let playerFront = this.state.carMovement.y + (this.state.playerHeight / 2)
-    let playerBack = this.state.carMovement.y - (this.state.playerHeight / 2)
+    let objX = this.state.obstructionPosition1.x
+    let objY = this.state.obstructionPosition1.y
+    let playerX = this.state.carMovement.x
+    let playerY = this.state.carMovement.y
 
-    let obstruction1Right = this.state.obstructionPosition1.x + (this.state.playerWidth / 2)
-    let obstruction1Left = this.state.obstructionPosition1.x - (this.state.playerWidth / 2)
-    let obstruction1Front = this.state.obstructionPosition1.y + (this.state.playerHeight / 2)
-    let obstruction1Back = this.state.obstructionPosition1.y - (this.state.playerDepth / 2)
+    // if we're just using the test box
+    let disWidth = this.state.playerWidth + 0.05
 
-    if (playerLeft <= obstruction1Right && playerFront >= obstruction1Back && playerRight >= obstruction1Left){
+    // if we're using the big boi car
+    // let disWidth = this.state.playerWidth + 0.2
+
+    if (objX > playerX-disWidth && objX < playerX+disWidth && objY > playerY && objY < playerY+this.state.playerHeight) {
       this.setState({collisionCount: this.state.collisionCount + 1})
-      console.log('player left side: ', playerLeft)
-      console.log('Obstruct right side: ', obstruction1Right)
-      console.log(this.state.collisionCount)
-
-      }
+      console.log("COLLISION HAPPENED", this.state.collisionCount);
+      console.log("----------");
     }
+  }
 
 
   _onAnimate = () => {
@@ -69,11 +69,20 @@ class DemoScene extends React.Component {
         this.state.obstructionPosition1.y - .1,
         this.state.obstructionPosition1.z + .1
       ),
+
+      obstructionRotation: new THREE.Euler(
+        this.state.obstructionRotation.x + 0,
+        this.state.obstructionRotation.y + 0.2,
+        0),
+
       obstructionPosition2: new THREE.Vector3(
         this.state.obstructionPosition2.x - .01,
         this.state.obstructionPosition2.y - .1,
         this.state.obstructionPosition2.z + .1
-      )
+      ),
+      // obstructionRotation: new THREE.Euler(
+      //   this.state.obstructionRotation.x + .1
+      // )
     }, () => this.resetter())
   }
 
@@ -178,8 +187,8 @@ class DemoScene extends React.Component {
             <meshBasicMaterial color={'white'}/>
           </mesh>
 
-          <mesh rotation={new THREE.Euler(2,3.135)} position={this.state.obstructionPosition1}>
-            <boxGeometry width={this.state.playerWidth} height={this.state.playerHeight} depth={this.state.playerHeight}/>
+          <mesh  rotation={this.state.obstructionRotation} position={this.state.obstructionPosition1}>
+            <boxGeometry width={this.state.playerWidth} height={this.state.playerHeight} depth={this.state.playerDepth}/>
             <meshBasicMaterial color={'red'}/>
           </mesh>
 
@@ -258,11 +267,22 @@ class DemoScene extends React.Component {
           {/* <group name="exampleGroup" rotation={new THREE.Euler(.5, 59.7, 0)} position={this.state.carMovement}>
             <ObjectModel
               name="exampleObject"
-              model={exampleModel}
+              model={truck}
               // material color={'black'}
               scene={this.state.scene}
               scale={new THREE.Vector3(.1, .1, .1)}
               group="exampleGroup"
+            />
+          </group> */}
+
+          {/* <group name="sofa" rotation={new THREE.Euler(.5, 59.7, 0)} position={this.state.obstructionPosition1}>
+            <ObjectModel
+              name="exampleObject"
+              model={sofa}
+              material={sofaMaterial}
+              scene={this.state.scene}
+              scale={new THREE.Vector3(.1, .1, .1)}
+              group="sofa"
             />
           </group> */}
         </scene>
