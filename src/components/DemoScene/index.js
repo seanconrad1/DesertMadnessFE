@@ -45,6 +45,8 @@ class DemoScene extends React.Component {
   detectCollision = () =>{
     let objX = this.state.obstructionPosition1.x
     let objY = this.state.obstructionPosition1.y
+    let objX2 = this.state.obstructionPosition2.x
+    let objY2 = this.state.obstructionPosition2.y
     let playerX = this.state.carMovement.x
     let playerY = this.state.carMovement.y
 
@@ -58,23 +60,46 @@ class DemoScene extends React.Component {
     if (this.state.yetAnotherCounter < 1){
       if (objX > playerX-disWidth && objX < playerX+disWidth && objY > playerY && objY < playerY+this.state.playerHeight) {
           ++this.state.yetAnotherCounter
-          this.setState({collisionCount: this.state.collisionCount +1}, () => setTimeout(this.emptyFunction,500))
-          this.wreckCar()
+          this.setState({collisionCount: 1}, () => setTimeout(this.changeCollisionState,3000))
+        }
+      }
+
+    if (this.state.yetAnotherCounter < 1){
+      if (objX2 > playerX-disWidth && objX2 < playerX+disWidth && objY2 > playerY && objY2 < playerY+this.state.playerHeight) {
+          ++this.state.yetAnotherCounter
+          this.setState({collisionCount: 1}, () => setTimeout(this.changeCollisionState,3000))
         }
       }
     }
 
+  resetStateStuff = () => {
+     this.setState({yetAnotherCounter: 0,
+       carRotation: new THREE.Euler(.5, 59.7, 0),
+       carMovement: new THREE.Vector3(0,-.5,8)})
+  }
+
+  changeCollisionState = () =>{
+    this.setState({collisionCount: 0})
+    setTimeout(this.resetStateStuff, 500)
+  }
+
   wreckCar = () => {
-    console.log(this.state.carRotation);
     this.setState({
       carRotation: new THREE.Euler(
-          this.state.carRotation.x + 0,
+          this.state.carRotation.x + 0.1,
           this.state.carRotation.y + 0.2,
-          0)
-      })
+          0),
+      carMovement: new THREE.Vector3(
+        this.state.carMovement.x + .05,
+        this.state.carMovement.y = this.state.carMovement.y,
+        this.state.carMovement.z = this.state.carMovement.z
+      )
+    })
+
   }
 
   animate = () =>{
+    console.log(this.state.collisionCount);
     if (this.state.collisionCount == 0) {
       return this.normal_Animate()
     }else {
@@ -93,7 +118,7 @@ class DemoScene extends React.Component {
         this.state.whiteLineMovement.z + .1
       ),
       obstructionPosition1: new THREE.Vector3(
-        this.state.obstructionPosition1.x + .06,
+        this.state.obstructionPosition1.x + .02,
         this.state.obstructionPosition1.y - .1,
         this.state.obstructionPosition1.z + .1
       ),
@@ -209,7 +234,7 @@ class DemoScene extends React.Component {
 
           <mesh position={this.state.sky}>
             <planeGeometry width={50} height={6.5} widthSegments={200} heightSegments={200}/>
-            <meshBasicMaterial color={'blue'}/>
+            <meshBasicMaterial color={0x272b38}/>
           </mesh>
 
           <mesh position={this.state.desert}>
