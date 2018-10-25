@@ -4,7 +4,6 @@ import React from "react";
 import React3 from "react-three-renderer";
 import ObjectModel from 'react-three-renderer-objects';
 import truck from "../../assets/Monster_truck.obj";
-import car from "../../assets/Mr_Beep.obj"
 
 class DemoScene extends React.Component {
 
